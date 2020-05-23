@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';//this is imported later than bootstrap css so that we can overwrite the predefined style of boot
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
