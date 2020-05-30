@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.css';
+import 'bootstrap-social/bootstrap-social.css';
 import './index.css';//this is imported later than bootstrap css so that we can overwrite the predefined style of boot
 import App from './App';
 ReactDOM.render(
