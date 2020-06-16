@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Card, CardImg, CardTitle, CardText, CardBody, Breadcrumb, BreadcrumbItem, Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label} from 'reactstrap';
+import { Row, Col, Button, Card, CardImg, CardTitle, CardText, CardBody, Breadcrumb, BreadcrumbItem, Modal, ModalHeader, ModalBody, Label} from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { Control, LocalForm, Errors } from 'react-redux-form';
+
+const required = (val) => val && val.length;
+const maxLength = (len) => (val) => !(val) || (val.length <= len);
+const minLength = (len) => (val) => val && (val.length >= len);
 
     class CommentForm extends Component {
         constructor(props){ // didn't use constructor error & closing brace-error
@@ -19,11 +24,10 @@ import { Link } from 'react-router-dom';
             });
         }
 
-        handleSubmit(event) {// alert
+        handleSubmit(values) {// alert
             this.toggleModal();
-            alert("Rating: " + this.rating.value + " Your Name: " + this.username.value
-                + " Comment: " + this.comment.value);
-            event.preventDefault();
+            console.log('Comment: ' + JSON.stringify(values));
+            alert('Comment: ' + JSON.stringify(values));
         }
         
         render() {
@@ -34,32 +38,48 @@ import { Link } from 'react-router-dom';
             <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                 <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
                 <ModalBody>
-                    <Form onSubmit={this.handleSubmit}// alert
+                <div className="col-12"// to keep margin aligned 
+                >
+                    <LocalForm onSubmit= {(values) => this.handleSubmit(values)}// alert
                     >
-                        <FormGroup>
+                        <Row className="form-group">
                             <Label htmlFor="rating">Rating</Label>
-                            <Input type="select" name="rating" id="rating"
-                            innerRef={(input) => this.rating = input}// alert
-                            >
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup>
+                                <Control.select model=".rating" name="rating" id="rating"
+                                className="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </Control.select> 
+                        </Row>
+                        <Row className="form-group">
                             <Label htmlFor="username">Your Name</Label>
-                            <Input type="text" id="username" name="username" placeholder="Your Name"
-                            innerRef={(input) => this.username = input}/>
-                        </FormGroup>
-                        <FormGroup>
+                            <Control.text model=".username" id="username" name="username" placeholder="Your Name"
+                            className="form-control"
+                            validators={{
+                                required, minLength: minLength(3), maxLength: maxLength(15)
+                            }}
+                            />
+                            <Errors
+                                className="text-danger"
+                                model=".username"
+                                show="touched"
+                                messages={{
+                                    required: 'Required',
+                                    minLength: 'Must be greater than 2 characters',
+                                    maxLength: 'Must be 15 characters or less'
+                                }}
+                            />      
+                        </Row>
+                        <Row className="form-group">
                             <Label htmlFor="comment">Comment</Label>
-                            <Input type="textarea" rows="6" id="comment" name="comment" 
-                            innerRef={(input) => this.comment = input}/>
-                        </FormGroup>
+                            <Control.textarea model=".comment" rows="6" id="comment" name="comment" 
+                            className="form-control"/>
+                        </Row>
                         <Button type="submit" value="submit" color="primary">Submit</Button>
-                    </Form>    
+                    </LocalForm> 
+                </div>   
               </ModalBody>
           </Modal>
           </React.Fragment>
