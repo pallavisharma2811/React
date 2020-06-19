@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Button, Card, CardImg, CardTitle, CardText, CardBody, Breadcrumb, BreadcrumbItem, Modal, ModalHeader, ModalBody, Label} from 'reactstrap';
+import { Row, Button, Card, CardImg, CardTitle, CardText, CardBody, Breadcrumb, BreadcrumbItem, Modal, ModalHeader, ModalBody, Label} from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 
@@ -24,10 +24,9 @@ const minLength = (len) => (val) => val && (val.length >= len);
             });
         }
 
-        handleSubmit(values) {// alert
+        handleSubmit(values) {// using props supplied add comments to the list
             this.toggleModal();
-            console.log('Comment: ' + JSON.stringify(values));
-            alert('Comment: ' + JSON.stringify(values));
+            this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
         }
         
         render() {
@@ -54,8 +53,8 @@ const minLength = (len) => (val) => val && (val.length >= len);
                                 </Control.select> 
                         </Row>
                         <Row className="form-group">
-                            <Label htmlFor="username">Your Name</Label>
-                            <Control.text model=".username" id="username" name="username" placeholder="Your Name"
+                            <Label htmlFor="author">Your Name</Label>
+                            <Control.text model=".author" id="author" name="author" placeholder="Your Name"
                             className="form-control"
                             validators={{
                                 required, minLength: minLength(3), maxLength: maxLength(15)
@@ -63,7 +62,7 @@ const minLength = (len) => (val) => val && (val.length >= len);
                             />
                             <Errors
                                 className="text-danger"
-                                model=".username"
+                                model=".author"
                                 show="touched"
                                 messages={{
                                     required: 'Required',
@@ -101,7 +100,7 @@ const minLength = (len) => (val) => val && (val.length >= len);
         );
     }
 
-    function renderComments(comments) {
+    function RenderComments({comments, addComment, dishId}) {//we need to pass addComment, dishId to CommentForm
         var commentList = comments.map(comment => {
             return (
                 <li key={comment.id} >
@@ -121,31 +120,33 @@ const minLength = (len) => (val) => val && (val.length >= len);
                 <ul className="list-unstyled">
                     {commentList}
                 </ul>
+                <CommentForm dishId= {dishId} addComment= {addComment}/>
             </div>
         );
     }
     
     
-    const  DishDetail = ({dish, comments}) => {// ES6 way of passing (props)
-      if (dish) {
+    const  DishDetail = (props) => {// ES6 way of passing (props)
+      if (props.dish) {
           return (
             <div className= "container">
               <div className="row">
                 <Breadcrumb>
                     <BreadcrumbItem><Link to="/menu">Menu</Link></BreadcrumbItem>
-                    <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
+                    <BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
                 </Breadcrumb>
                 <div className="col-12">
-                    <h3>{dish.name}</h3>
+                    <h3>{props.dish.name}</h3>
                     <hr />
                 </div>  
                                   
                 <div className="col-12 col-md-5 m-1">
-                 {renderDish(dish)}
+                    {renderDish(props.dish)}
                 </div>
                 <div className="col-12 col-md-5 m-1">
-                 {renderComments(comments)}
-                 <CommentForm />
+                    <RenderComments comments= {props.comments}
+                    addComment ={props.addComment}// came in as props to DishDetail
+                    dishId ={props.dish.id} />
                 </div>
               </div>
             </div>

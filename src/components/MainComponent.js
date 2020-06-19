@@ -11,6 +11,7 @@ import About from './AboutComponent';
 import DishDetail from './DishdetailComponent';
 import Contact from './ContactComponent';
 import {connect} from 'react-redux';
+import { addComment } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {//state from redux store
 
@@ -22,6 +23,11 @@ const mapStateToProps = state => {//state from redux store
   }
 
 }
+
+const mapDispatchToProps = dispatch =>({//addComment()call will return action object and passes to dispatch fun(function from store) which is supplied to the addComment:
+  addComment: (dishId, rating, author, comment)=> dispatch(addComment(dishId, rating, author, comment))
+});
+
 //Container Component
 class Main extends Component {
 
@@ -44,7 +50,9 @@ class Main extends Component {
     const DishWithId = ({match}) => {
       return(
           <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
-            comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))} />
+            comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+            addComment={this.props.addComment}// to dispatch action to store, in the dish detail component we have access to comment that user has submitted 
+          />
       );
     };
 
@@ -65,4 +73,4 @@ class Main extends Component {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));// to make mapDispatchToProps available in main component
