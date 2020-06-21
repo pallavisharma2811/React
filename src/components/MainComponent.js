@@ -10,8 +10,8 @@ import Home from './HomeComponent';
 import About from './AboutComponent';
 import DishDetail from './DishdetailComponent';
 import Contact from './ContactComponent';
-import {connect} from 'react-redux';
-import { addComment } from '../redux/ActionCreators';
+import { connect } from 'react-redux';
+import { addComment, fetchDishes} from '../redux/ActionCreators';
 
 const mapStateToProps = state => {//state from redux store
 
@@ -25,7 +25,8 @@ const mapStateToProps = state => {//state from redux store
 }
 
 const mapDispatchToProps = dispatch =>({//addComment()call will return action object and passes to dispatch fun(function from store) which is supplied to the addComment:
-  addComment: (dishId, rating, author, comment)=> dispatch(addComment(dishId, rating, author, comment))
+  addComment: (dishId, rating, author, comment)=> dispatch(addComment(dishId, rating, author, comment)),
+  fetchDishes: () => {dispatch(fetchDishes())}
 });
 
 //Container Component
@@ -35,12 +36,18 @@ class Main extends Component {
     super(props);
   }
 
+  componentDidMount(){ // Called soon after this component gets mounted so a good time to fetch any data required for application
+    this.props.fetchDishes();
+  }
+
   render() {
 
     const HomePage = () => {//explicitly declare the functional component in 1st route and inline declaration in 2nd rout
       return(
           <Home 
-          dish={this.props.dishes.filter(dish => dish.featured)[0]}
+          dish={this.props.dishes.dishes.filter(dish => dish.featured)[0]}
+          dishesLoading={this.props.dishes.isLoading}
+          dishesErrMess={this.props.dishes.errMess}
           promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
           leader={this.props.leaders.filter((leader) => leader.featured)[0]}
           />
@@ -49,7 +56,9 @@ class Main extends Component {
 
     const DishWithId = ({match}) => {
       return(
-          <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]} 
+            dishesLoading={this.props.dishes.isLoading}
+            dishesErrMess={this.props.dishes.errMess}
             comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
             addComment={this.props.addComment}// to dispatch action to store, in the dish detail component we have access to comment that user has submitted 
           />
@@ -61,7 +70,9 @@ class Main extends Component {
         <Header />
         <Switch>
           <Route path ="/home" component={HomePage}/>
-          <Route exact path ="/menu" component={()=><Menu dishes={this.props.dishes}/>}/>
+          <Route exact path ="/menu" component={()=><Menu dishes={this.props.dishes}/>}
+          //entire dishes object is being passed i.e. isloading, dishes.dishes, dishes.ErrMess all three to available in Menu
+          />
           <Route path="/menu/:dishId" component={DishWithId} />
           <Route exact path="/contactus" component={Contact} />
           <Route exact path="/aboutus" component={() => <About leaders={this.props.leaders} />} />
