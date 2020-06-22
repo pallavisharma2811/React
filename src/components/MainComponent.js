@@ -12,6 +12,7 @@ import DishDetail from './DishdetailComponent';
 import Contact from './ContactComponent';
 import { connect } from 'react-redux';
 import { addComment, fetchDishes} from '../redux/ActionCreators';
+import { actions } from 'react-redux-form';
 
 const mapStateToProps = state => {//state from redux store
 
@@ -26,7 +27,8 @@ const mapStateToProps = state => {//state from redux store
 
 const mapDispatchToProps = dispatch =>({//addComment()call will return action object and passes to dispatch fun(function from store) which is supplied to the addComment:
   addComment: (dishId, rating, author, comment)=> dispatch(addComment(dishId, rating, author, comment)),
-  fetchDishes: () => {dispatch(fetchDishes())}
+  fetchDishes: () => {dispatch(fetchDishes())},
+  resetFeedbackForm: () => { dispatch(actions.reset('feedback')) }
 });
 
 //Container Component
@@ -74,7 +76,7 @@ class Main extends Component {
           //entire dishes object is being passed i.e. isloading, dishes.dishes, dishes.ErrMess all three to available in Menu
           />
           <Route path="/menu/:dishId" component={DishWithId} />
-          <Route exact path="/contactus" component={Contact} />
+          <Route exact path="/contactus" component={() => <Contact resetFeedbackForm={this.props.resetFeedbackForm} />} />
           <Route exact path="/aboutus" component={() => <About leaders={this.props.leaders} />} />
           <Redirect to = "/home" />
         </Switch>
